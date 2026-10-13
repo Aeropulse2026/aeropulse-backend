@@ -1,0 +1,15 @@
+meta {
+  name: Aircraft Detail
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/fleet/aircraft/MiG-29
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:8000
+}

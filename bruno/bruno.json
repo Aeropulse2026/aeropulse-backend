@@ -1,0 +1,15 @@
+{
+  "name": "AeroPulse Backend",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ],
+  "size": 0.00141143798828125,
+  "filesCount": 8,
+  "presets": {
+    "requestType": "http",
+    "requestUrl": "http://localhost:8000"
+  },
+  "version": "1"
+}

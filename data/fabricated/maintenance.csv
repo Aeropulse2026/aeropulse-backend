@@ -1,0 +1,5 @@
+work_order_id,aircraft_id,component,action,downtime_hours,outcome,completed_at
+WO-004-FUE,AF-104,fuel_system,inspection and seal replacement,12,resolved,2026-06-09
+WO-008-ENG,AF-108,engine,bearing replacement,18,resolved,2026-03-18
+WO-017-HYD,AF-117,hydraulic_pump,bearing replacement,12,resolved,2026-04-21
+WO-023-LAN,AF-123,landing_gear,inspection and seal replacement,12,resolved,2026-05-23

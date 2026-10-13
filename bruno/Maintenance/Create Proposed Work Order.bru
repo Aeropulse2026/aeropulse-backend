@@ -1,0 +1,25 @@
+meta {
+  name: Create Maintenance Task
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/maintenance/tasks/
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "aircraft": 1,
+    "squadron": 1,
+    "component": "hydraulic_pump",
+    "action": "Inspect hydraulic pump assembly",
+    "priority_score": 78
+  }
+}

@@ -1,0 +1,7 @@
+part_id,part_name,compatible_subsystem,stock_on_hand,reorder_point,lead_days
+P-HYD-22,Hydraulic pump kit,hydraulic_pump,2,4,10
+P-ENG-11,Engine bearing set,engine,6,3,21
+P-AVN-08,Avionics cooling module,avionics,9,3,14
+P-LDG-15,Landing gear seal kit,landing_gear,5,4,18
+P-FUL-04,Fuel pressure regulator,fuel_system,7,3,12
+P-ELC-19,Generator brush pack,electrical,11,4,9

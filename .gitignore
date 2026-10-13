@@ -1,0 +1,23 @@
+.venv/
+
+# Python cache and test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local database and uploaded/generated files
+db.sqlite3
+media/
+staticfiles/
+
+# Environment files and secrets
+.env
+
+# IDE and operating-system files
+.vscode/
+.idea/
+.DS_Store

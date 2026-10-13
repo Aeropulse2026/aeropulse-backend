@@ -1,0 +1,25 @@
+[project]
+name = "aeropulse-backend"
+version = "0.1.0"
+description = "AeroPulse maintenance decision-support API"
+requires-python = ">=3.12"
+dependencies = [
+    "Django>=5.2,<6.0",
+    "djangorestframework>=3.15,<4.0",
+    "django-cors-headers>=4.6,<5.0",
+    "psycopg[binary]>=3.2,<4.0",
+    "python-dotenv>=1.0,<2.0",
+    "requests>=2.32,<3.0",
+    "beautifulsoup4>=4.12,<5.0",
+    "djangorestframework-simplejwt>=5.5,<6.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3,<9.0",
+    "pytest-django>=4.9,<5.0",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
