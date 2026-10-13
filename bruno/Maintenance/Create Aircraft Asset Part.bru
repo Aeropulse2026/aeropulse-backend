@@ -1,0 +1,29 @@
+meta {
+  name: Create Aircraft Asset Part
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/maintenance/asset-parts/
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "aircraft": "{{aircraftId}}",
+    "spare_part": "{{sparePartId}}",
+    "serial_number": "HYD-SN-0001",
+    "installed_location": "Port hydraulic bay",
+    "installed_on": "2026-01-15",
+    "last_maintained_on": "2026-09-15",
+    "next_maintenance_on": "2026-12-15",
+    "status": "installed",
+    "notes": "Initial asset registration"
+  }
+}

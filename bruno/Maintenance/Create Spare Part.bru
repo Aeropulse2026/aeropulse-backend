@@ -1,0 +1,27 @@
+meta {
+  name: Create Spare Part
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/maintenance/spare-parts/
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "part_id": "HYD-VALVE-001",
+    "name": "Hydraulic Control Valve",
+    "compatible_subsystem": "hydraulic_pump",
+    "stock_on_hand": 8,
+    "reserved_stock": 0,
+    "reorder_point": 3,
+    "lead_days": 14
+  }
+}

@@ -19,6 +19,15 @@ The collection includes fleet overview, individual aircraft, telemetry import,
 maintenance tasks, the imported IAF fleet snapshot, squadron records, and
 individual squadron-aircraft records.
 
+Create spare-part catalogue records first using `Maintenance / Create Spare
+Part`. The catalogue supports full CRUD at `/api/maintenance/spare-parts/`.
+
+`Maintenance / Create Aircraft Asset Part` registers an individually serialized
+spare part against an internal aircraft. Set `aircraftId` to an existing
+`Aircraft.aircraft_id` and `sparePartId` to an existing `InventoryPart.part_id`.
+Use `List Aircraft Asset Parts` to view all assignments, or append
+`?aircraft=YOUR_AIRCRAFT_ID` to filter the request URL.
+
 The `Squadrons / List IAF Squadrons` request reads the locally stored squadron
 records at `GET /api/fleet/squadrons/`. Populate those records once with
 `uv run python manage.py scrape_iaf_squadrons`; the scraper is a management

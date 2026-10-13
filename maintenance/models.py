@@ -1,6 +1,6 @@
 from django.db import models
 
-from fleet.models import Aircraft
+from fleet.models import Aircraft, InventoryPart
 from squadron.models import Squadron
 
 
@@ -38,3 +38,49 @@ class MaintenanceTask(models.Model):
 
     def __str__(self):
         return f"{self.aircraft.aircraft_id} - {self.component}"
+
+
+class AssetPart(models.Model):
+    """A serialized spare part installed on a specific aircraft."""
+
+    class Status(models.TextChoices):
+        INSTALLED = "installed", "Installed"
+        IN_SERVICE = "in_service", "In service"
+        UNDER_MAINTENANCE = "under_maintenance", "Under maintenance"
+        RETIRED = "retired", "Retired"
+
+    aircraft = models.ForeignKey(
+        Aircraft,
+        on_delete=models.PROTECT,
+        related_name="asset_parts",
+    )
+    inventory_part = models.ForeignKey(
+        InventoryPart,
+        on_delete=models.PROTECT,
+        related_name="asset_assignments",
+    )
+    serial_number = models.CharField(max_length=80, unique=True)
+    installed_location = models.CharField(max_length=100, blank=True)
+    installed_on = models.DateField(null=True, blank=True)
+    last_maintained_on = models.DateField(null=True, blank=True)
+    next_maintenance_on = models.DateField(null=True, blank=True)
+    status = models.CharField(
+        max_length=24,
+        choices=Status.choices,
+        default=Status.INSTALLED,
+    )
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["aircraft__aircraft_id", "serial_number"]
+        indexes = [
+            models.Index(
+                fields=["aircraft", "status", "next_maintenance_on"],
+                name="assetpart_aircraft_due_idx",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.serial_number} — {self.inventory_part.name}"

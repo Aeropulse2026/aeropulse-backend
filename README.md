@@ -36,6 +36,11 @@ real or sensitive data.
 - `GET, POST /api/fleet/squadron-aircraft/` — individual aircraft assigned to squadrons.
 - `GET /api/fleet/squadron-aircraft/?squadron={squadron_id}` — an individual squadron's aircraft.
 - `GET, POST /api/maintenance/tasks/` — maintenance tasks.
+- `GET, POST /api/maintenance/spare-parts/` — spare-part catalogue.
+- `GET, PUT, PATCH, DELETE /api/maintenance/spare-parts/{part_id}/` — one spare-part catalogue record.
+- `GET, POST /api/maintenance/asset-parts/` — serialized spare parts assigned to aircraft.
+- `GET, PUT, PATCH, DELETE /api/maintenance/asset-parts/{serial_number}/` — one assigned physical part.
+- `GET /api/maintenance/asset-parts/?aircraft={aircraft_id}` — parts installed on one aircraft.
 
 `fleet/services.py` is the integration boundary for feature engineering and model inference. Replace the TODO with a worker-backed ML pipeline later; the HTTP contract does not need to change.
 
@@ -112,5 +117,33 @@ Content-Type: application/json
   "last_maintenance_on": "2026-09-30",
   "next_maintenance_on": "2026-12-30",
   "operational_role": "Air superiority"
+}
+```
+
+## Aircraft asset parts
+
+`AssetPart` tracks a physical, serialized spare part installed on an internal
+`Aircraft`. It links the aircraft to an `InventoryPart` catalogue record, so a
+response includes both its assignment and the spare part's stock and
+compatibility details. Use `aircraft_id` and `part_id` values when creating an
+asset part.
+
+Create and manage the spare-part catalogue from the frontend through
+`/api/maintenance/spare-parts/`. The `spare_part` value for an asset part must
+match an existing catalogue `part_id`.
+
+```http
+POST /api/maintenance/asset-parts/
+Content-Type: application/json
+
+{
+  "aircraft": "AF-117",
+  "spare_part": "HYD-PUMP-001",
+  "serial_number": "HYD-SN-0001",
+  "installed_location": "Port hydraulic bay",
+  "installed_on": "2026-01-15",
+  "last_maintained_on": "2026-09-15",
+  "next_maintenance_on": "2026-12-15",
+  "status": "installed"
 }
 ```

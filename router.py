@@ -21,7 +21,7 @@ from fleet.views import (
 )
 
 from squadron.views import SquadronAircraftViewSet, SquadronViewSet
-from maintenance.views import MaintenanceTaskViewSet
+from maintenance.views import AssetPartViewSet, MaintenanceTaskViewSet, SparePartViewSet
 
 router = DefaultRouter()
 router.register(
@@ -40,6 +40,16 @@ maintenance_router.register(
     "tasks",
     MaintenanceTaskViewSet,
     basename="maintenance-task",
+)
+maintenance_router.register(
+    "asset-parts",
+    AssetPartViewSet,
+    basename="asset-part",
+)
+maintenance_router.register(
+    "spare-parts",
+    SparePartViewSet,
+    basename="spare-part",
 )
 
 auth_urlpatterns = [
