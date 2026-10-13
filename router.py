@@ -20,7 +20,7 @@ from fleet.views import (
     WorkOrderDetailView,
 )
 
-from squadron.views import SquadronViewSet
+from squadron.views import SquadronAircraftViewSet, SquadronViewSet
 from maintenance.views import MaintenanceTaskViewSet
 
 router = DefaultRouter()
@@ -28,6 +28,11 @@ router.register(
     "squadrons",
     SquadronViewSet,
     basename="squadron",
+)
+router.register(
+    "squadron-aircraft",
+    SquadronAircraftViewSet,
+    basename="squadron-aircraft",
 )
 
 maintenance_router = DefaultRouter()

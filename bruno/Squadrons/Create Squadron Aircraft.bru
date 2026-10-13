@@ -1,0 +1,29 @@
+meta {
+  name: Create Squadron Aircraft
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/fleet/squadron-aircraft/
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "squadron": "{{squadronId}}",
+    "aircraft_number": "SB-001",
+    "aircraft_name": "Su-30MKI",
+    "country_of_origin": "India / Russia",
+    "year_inducted": 2002,
+    "flight_hours": "1842.5",
+    "last_maintenance_on": "2026-09-30",
+    "next_maintenance_on": "2026-12-30",
+    "operational_role": "Air superiority"
+  }
+}

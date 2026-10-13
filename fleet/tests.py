@@ -17,13 +17,21 @@ class FleetApiTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["mission_ready"], 1)
 
+    def test_api_requests_do_not_require_authentication(self):
+        self.client.force_authenticate(user=None)
+        response = self.client.get("/api/fleet/overview")
+        self.assertEqual(response.status_code, 200)
+
     def test_csv_import_is_saved_and_checked(self):
+        self.client.force_authenticate(user=None)
         data = b"timestamp,aircraft_id,subsystem,vibration_mm_s,temperature_c,pressure_psi,oil_level_pct\n2026-01-01,AF-117,hydraulic_pump,2.1,60,2500,80\n"
         upload = SimpleUploadedFile("telemetry.csv", data, content_type="text/csv")
         with self.captureOnCommitCallbacks(execute=True):
             response = self.client.post("/api/fleet/imports/telemetry", {"file": upload}, format="multipart")
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(TelemetryImport.objects.get().status, TelemetryImport.Status.COMPLETE)
+        import_record = TelemetryImport.objects.get()
+        self.assertEqual(import_record.status, TelemetryImport.Status.COMPLETE)
+        self.assertIsNone(import_record.uploaded_by)
 
     def test_globalmilitary_table_parser(self):
         html = """<p>Updated 26 Sep 2026</p><p>operates 2,338 military aircraft and 691 more aircraft on order</p>

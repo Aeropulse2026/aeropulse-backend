@@ -19,7 +19,10 @@ class TelemetryImportView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         # Django streams larger uploads to a temporary file, then stores it via FileField.
-        import_record = serializer.save(uploaded_by=self.request.user)
+        save_kwargs = {}
+        if self.request.user.is_authenticated:
+            save_kwargs["uploaded_by"] = self.request.user
+        import_record = serializer.save(**save_kwargs)
         # A Celery/RQ worker can call this same function later.  Keeping the hook
         # after commit prevents it from reading a file that has not been saved yet.
         transaction.on_commit(lambda: refresh_features_and_predictions(import_record.id))
@@ -53,7 +56,10 @@ class WorkOrderCreateView(generics.CreateAPIView):
     serializer_class = WorkOrderSerializer
 
     def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user, status=WorkOrder.Status.PENDING)
+        save_kwargs = {"status": WorkOrder.Status.PENDING}
+        if self.request.user.is_authenticated:
+            save_kwargs["created_by"] = self.request.user
+        serializer.save(**save_kwargs)
 
 
 class IafFleetView(APIView):

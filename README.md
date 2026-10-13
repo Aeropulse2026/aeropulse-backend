@@ -7,42 +7,35 @@ Django REST Framework backend for the AeroPulse maintenance-planning MVP. It kee
 ```bash
 uv sync --group dev
 uv run python manage.py migrate
-uv run python manage.py createsuperuser
 uv run python manage.py runserver
 ```
 
-The API is served at `http://127.0.0.1:8000/api/`. Sign in through `/admin/` while developing, or add token/JWT authentication before deploying.
+The API is served at `http://127.0.0.1:8000/api/`. Create an admin user with
+`uv run python manage.py createsuperuser` only if you need Django admin access.
 
-Create a bearer token for Bruno after migrations:
+## Authentication status
 
-```bash
-uv run python manage.py drf_create_token YOUR_USERNAME
-```
-
-Copy the generated token into the selected Bruno environment's `token` variable.
-
-## JWT authentication
-
-Use cookie-based JWT authentication for the Next.js frontend. Access tokens last 15 minutes. Refresh tokens last 7 days and rotate whenever they are refreshed. Both cookies are HttpOnly, so browser JavaScript cannot read the refresh token.
-
-| Method | Endpoint | Request body |
-| --- | --- | --- |
-| POST | `/api/auth/signup` | `{"username":"planner","password":"at-least-8-characters","email":"optional@example.com"}` |
-| POST | `/api/auth/login` | `{"username":"planner","password":"..."}` |
-| POST | `/api/auth/refresh` | No body; reads the HttpOnly refresh cookie |
-| POST | `/api/auth/logout` | No body; blacklists the HttpOnly refresh cookie |
-
-Signup and login set `aeropulse_access` and `aeropulse_refresh` HttpOnly cookies and return user metadata only. Use `credentials: "include"` in Next.js requests. When an API request returns 401, call `/api/auth/refresh`, then retry once.
-
-Copy-ready Next.js middleware and API-client templates are in `docs/nextjs-auth/`. The Next.js server must have the same server-only `JWT_SIGNING_KEY` as Django so it can validate the signed short-lived access cookie before serving protected routes.
+All API endpoints are intentionally public during development. Bruno requests do
+not need a bearer token. JWT and token code remains in the project for a later
+authentication phase; re-enable protected routes before any deployment with
+real or sensitive data.
 
 ## Current endpoints
 
-- `POST /api/imports/telemetry` - persists a CSV upload using Django storage and validates its header.
-- `GET /api/fleet/overview` - fleet readiness summary.
-- `GET /api/aircraft/{aircraft_id}` - aircraft profile.
-- `GET /api/maintenance/queue` - priority ordered proposed work orders.
-- `POST /api/work-orders` - creates a work order in `pending` state, awaiting human approval.
+- `GET /api/fleet/overview` — fleet readiness summary.
+- `GET /api/fleet/aircraft/{aircraft_id}` — internal aircraft profile.
+- `GET /api/fleet/aircraft/{aircraft_id}/telemetry` — latest component telemetry.
+- `GET /api/fleet/aircraft/{aircraft_id}/risk` — latest component risk scores.
+- `POST /api/fleet/imports/telemetry` — upload and process telemetry CSV data.
+- `GET /api/fleet/maintenance/queue` — proposed maintenance work orders.
+- `POST /api/fleet/work-orders` — create a pending work order.
+- `GET /api/fleet/inventory` and `GET /api/fleet/inventory/forecast` — spare-part inventory.
+- `GET /api/fleet/iaf/fleet` — latest imported GlobalMilitary IAF fleet snapshot.
+- `GET, POST /api/fleet/squadrons/` — IAF squadrons.
+- `GET, PUT, PATCH, DELETE /api/fleet/squadrons/{squadron_id}/` — one squadron.
+- `GET, POST /api/fleet/squadron-aircraft/` — individual aircraft assigned to squadrons.
+- `GET /api/fleet/squadron-aircraft/?squadron={squadron_id}` — an individual squadron's aircraft.
+- `GET, POST /api/maintenance/tasks/` — maintenance tasks.
 
 `fleet/services.py` is the integration boundary for feature engineering and model inference. Replace the TODO with a worker-backed ML pipeline later; the HTTP contract does not need to change.
 
@@ -79,4 +72,45 @@ The command below fetches the public HTML inventory table from GlobalMilitary.ne
 uv run python manage.py scrape_iaf_fleet
 ```
 
-Read the latest stored import at `GET /api/iaf/fleet`. The returned payload attributes the source and does not claim the third-party data is first-party or real-time.
+Read the latest stored import at `GET /api/fleet/iaf/fleet`. The returned payload attributes the source and does not claim the third-party data is first-party or real-time.
+
+## Public IAF squadron import
+
+This command imports named **Flying Units** labelled Squadron or Sqn from the
+public Bharat-Rakshak IAF units index. It intentionally excludes flights,
+missile, radar, and signal units. The source does not provide a base or
+aircraft count on the index, so those fields are left blank.
+
+```bash
+uv run python manage.py scrape_iaf_squadrons
+```
+
+Use `--dry-run` to inspect the parsed record count without writing to the
+database.
+
+## Squadron aircraft records
+
+`SquadronAircraft` represents an individually identifiable aircraft assigned
+to a squadron. Each record stores a unique aircraft number, aircraft name,
+country of origin, year inducted, flight hours, maintenance dates, and role.
+The public squadron index does not provide this aircraft-level information, so
+create these records through the API or Bruno after importing the squadron list.
+
+Example request:
+
+```http
+POST /api/fleet/squadron-aircraft/
+Content-Type: application/json
+
+{
+  "squadron": "YOUR_SQUADRON_ID",
+  "aircraft_number": "SB-001",
+  "aircraft_name": "Su-30MKI",
+  "country_of_origin": "India / Russia",
+  "year_inducted": 2002,
+  "flight_hours": "1842.5",
+  "last_maintenance_on": "2026-09-30",
+  "next_maintenance_on": "2026-12-30",
+  "operational_role": "Air superiority"
+}
+```
